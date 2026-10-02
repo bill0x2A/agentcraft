@@ -1,0 +1,27 @@
+START office-test-1790962136801
+PASS two named home-anchored mobs linked to distinct terminals
+PASS AGENTS_REQUEST working
+PASS both custom mobs animate Herdr working state
+PASS AGENTS_REQUEST blocked
+PASS both custom mobs show Herdr attention state and explicit nameplates
+PASS AGENTS_REQUEST idle
+PASS both custom mobs return to resting when Herdr reports idle/done
+PASS mob 0 interaction opens correct live process and accepts screen text input
+PASS mob 1 interaction opens correct live process and accepts screen text input
+PASS displaced mob returns to its fixed home
+PASS legacy villager migrates to custom mob preserving UUID and session binding
+PASS backed up disposable verification world before reload
+PASS version-1 world reload preserves mob UUIDs, terminal IDs, labels, homes and detected characters
+PASS mob 0 resumes same live process and terminal contents after world reload
+PASS mob 1 resumes same live process and terminal contents after world reload
+PASS AWAIT_END term_65cdedb4960f31c
+PASS ended session remains linked, is unavailable, and cannot open another terminal
+PASS nameplate reflects unavailable session
+PASS Create + link button creates a real shell and its linked mob
+PASS removing a mob leaves its Herdr session running
+PASS Chromium renders a live HTML page on a placed world monitor
+PASS browser receives real Minecraft mouse clicks and keyboard input, verified in Chromium DOM text
+PASS closing controls preserves the same live browser and page state in the world
+PASS browser navigates to a live local HTTP app
+PASS world reload restores monitor UUID, position and saved URL with a fresh browser
+PASS monitor removal disposes its browser; ALL PASS

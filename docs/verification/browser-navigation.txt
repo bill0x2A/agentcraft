@@ -1,0 +1,12 @@
+PASS external helper navigates the embedded browser to a local web app
+{
+  "frameId": "63AC57C0975D5361F797663400E5965A",
+  "loaderId": "F89CBBEE92B68548924501534E784FC7",
+  "isDownload": false
+}
+{
+  "result": {
+    "type": "string",
+    "value": "Local agent navigation verified"
+  }
+}

@@ -1,0 +1,44 @@
+#!/usr/bin/env node
+// Dependency-free CDP helper for the explicitly enabled, loopback-only office browser.
+const endpoint = 'http://127.0.0.1:9222';
+const [command = 'list', targetId, ...args] = process.argv.slice(2);
+async function main() {
+  const response = await fetch(`${endpoint}/json/list`, {signal: AbortSignal.timeout(5000)});
+  if (!response.ok) throw new Error(`Chromium returned HTTP ${response.status}`);
+  const targets = (await response.json()).filter(t => t.type === 'page');
+  if (command === 'list') {
+    console.log(JSON.stringify(targets.map(({id, title, url}) => ({id, title: title.slice(0,120), url: url.startsWith('data:') ? '[Office home page]' : url})), null, 2));
+    return;
+  }
+  if (!['eval', 'navigate'].includes(command) || !targetId || !args.length)
+    throw new Error('Usage: scripts/browser list | eval TARGET_ID JAVASCRIPT | navigate TARGET_ID HTTP_URL');
+  const target = targets.find(t => t.id === targetId);
+  if (!target) throw new Error('That browser target no longer exists. Run scripts/browser list again.');
+  const socketUrl = new URL(target.webSocketDebuggerUrl);
+  if (socketUrl.hostname !== '127.0.0.1' || socketUrl.port !== '9222' || socketUrl.protocol !== 'ws:')
+    throw new Error('Refusing a DevTools socket outside the local office endpoint');
+  let method, params;
+  if (command === 'navigate') {
+    const url = new URL(args.join(' '));
+    if (!['http:', 'https:'].includes(url.protocol)) throw new Error('Use an HTTP(S) URL');
+    method = 'Page.navigate'; params = {url: url.href};
+  } else {
+    method = 'Runtime.evaluate'; params = {expression: args.join(' '), returnByValue: true, awaitPromise: true};
+  }
+  const result = await new Promise((resolve, reject) => {
+    const ws = new WebSocket(socketUrl);
+    const timer = setTimeout(() => {ws.close(); reject(new Error('DevTools request timed out'));}, 15000);
+    const finish = (error, value) => {clearTimeout(timer); ws.close(); error ? reject(error) : resolve(value);};
+    ws.addEventListener('open', () => ws.send(JSON.stringify({id: 1, method, params})));
+    ws.addEventListener('error', () => finish(new Error('Could not connect to Chromium DevTools')));
+    ws.addEventListener('message', event => {
+      const message = JSON.parse(event.data);
+      if (message.id === 1) finish(message.error ? new Error(JSON.stringify(message.error)) : null, message.result);
+    });
+  });
+  console.log(JSON.stringify(result, null, 2));
+}
+main().catch(error => {
+  console.error(`${error.message}\nStart Minecraft with ./scripts/mc client -PbrowserControl and open/place a browser first.`);
+  process.exitCode = 1;
+});

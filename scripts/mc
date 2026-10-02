@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+set -euo pipefail
+source "$(dirname -- "${BASH_SOURCE[0]}")/environment.sh"
+cd "$WORKSPACE_ROOT"
+action="${1:-help}"
+if (( $# )); then shift; fi
+case "$action" in
+    setup) exec "$WORKSPACE_ROOT/scripts/setup.sh" "$@" ;;
+    doctor) exec "$WORKSPACE_ROOT/scripts/doctor.sh" "$@" ;;
+    help|-h|--help)
+        printf '%s\n' \
+            'Usage: ./scripts/mc <command> [Gradle arguments]' \
+            '  setup    Install a checksum-verified local JDK 25' \
+            '  doctor   Check prerequisites and display availability' \
+            '  build    Compile, check, and package the mod' \
+            '  client   Launch the isolated development client (run/)' \
+            '  server   Launch the development server (run-server/; EULA acceptance required)' \
+            '  sources Generate Minecraft sources for IDE navigation' \
+            '  gradle   Run any Gradle task, e.g. gradle --version'
+        exit 0 ;;
+    build) task=build ;;
+    client) task=runClient ;;
+    server) task=runServer ;;
+    sources) task=genSources ;;
+    gradle) task='' ;;
+    *) printf 'Unknown command: %s. Run ./scripts/mc help.\n' "$action" >&2; exit 2 ;;
+esac
+use_workspace_java
+if [[ -n "$task" ]]; then
+    exec "$WORKSPACE_ROOT/gradlew" "$task" "$@"
+else
+    exec "$WORKSPACE_ROOT/gradlew" "$@"
+fi
+

@@ -1,0 +1,3 @@
+START focused browser verification
+PASS Minecraft mouse wheel scrolls the actual Chromium page in the expected direction
+PASS external CDP helper changed this same embedded browser; ALL PASS

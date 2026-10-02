@@ -1,0 +1,71 @@
+plugins {
+    id 'net.fabricmc.fabric-loom' version "${loom_version}"
+}
+
+loom {
+    splitEnvironmentSourceSets()
+    mods {
+        "modding_workspace" {
+            sourceSet sourceSets.main
+            sourceSet sourceSets.client
+        }
+    }
+    runs {
+        client {
+            runDir 'run'
+            if (project.hasProperty('browserControl')) vmArg '-Dmodding.browser.debugPort=9222'
+            if (project.hasProperty('officeVerification')) {
+                runDir 'run-office-test'
+                vmArg '-Dmodding.office.verify=true'
+                vmArg "-Dmodding.terminal.socket=${projectDir}/.runtime/office-test.sock"
+                if (project.hasProperty('agentVerification')) vmArg '-Dmodding.office.verifyAgents=true'
+            }
+            if (project.hasProperty('browserVerification')) {
+                runDir 'run-browser-test'
+                vmArg '-Dmodding.browser.verify=true'
+            }
+            if (project.hasProperty('terminalPreview')) {
+                vmArg '-Dmodding.terminal.autoOpen=true'
+                vmArg '-Dmodding.terminal.capture=true'
+            }
+        }
+        server { runDir 'run-server' }
+    }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+    clientCompileOnly "me.friwi:jcef-api:jcef-d3de827+cef-146.0.10+g8219561+chromium-146.0.7680.179"
+    clientImplementation "maven.modrinth:mcef-modern:${project.mcef_modern_version}"
+}
+
+repositories {
+    exclusiveContent {
+        forRepository { maven { url = 'https://api.modrinth.com/maven' } }
+        filter { includeGroup 'maven.modrinth' }
+    }
+}
+
+processResources {
+    def modVersion = project.version.toString()
+    inputs.property 'version', modVersion
+    filesMatching('fabric.mod.json') {
+        expand 'version': modVersion
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.release = 25
+    options.encoding = 'UTF-8'
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(25)
+    withSourcesJar()
+}
+
+tasks.named('jar') {
+    from('licenses') { into 'META-INF/licenses' }
+}

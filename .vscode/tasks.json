@@ -1,0 +1,27 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Minecraft: build",
+      "type": "process",
+      "command": "${workspaceFolder}/scripts/mc",
+      "args": ["build"],
+      "group": {"kind": "build", "isDefault": true},
+      "problemMatcher": ["$javac"]
+    },
+    {
+      "label": "Minecraft: run client",
+      "type": "process",
+      "command": "${workspaceFolder}/scripts/mc",
+      "args": ["client"],
+      "problemMatcher": []
+    },
+    {
+      "label": "Minecraft: doctor",
+      "type": "process",
+      "command": "${workspaceFolder}/scripts/mc",
+      "args": ["doctor"],
+      "problemMatcher": []
+    }
+  ]
+}

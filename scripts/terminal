@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+case "${1:-start}" in
+    start)
+        python3 "$root/bridge/runtime.py"
+        exec python3 "$root/bridge/server.py" ;;
+    stop)
+        exec python3 "$root/bridge/runtime.py" stop ;;
+    status)
+        cd "$root/bridge"
+        exec python3 -c 'from server import rpc; import json; print(json.dumps(rpc("session.snapshot"), indent=2))' ;;
+    *) printf 'Usage: scripts/terminal [start|status|stop]\n' >&2; exit 2 ;;
+esac
