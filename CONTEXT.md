@@ -27,7 +27,7 @@ A session in which Herdr detects no agent. A new session is always a shell sessi
 _Avoid_: empty session, plain terminal
 
 **Agent**:
-The AI command-line tool that Herdr detects in a session: `claude` or `codex`. The office never starts an agent.
+The AI command-line tool that Herdr detects in a session: `claude` or `codex`. Group launch controls can explicitly start Claude or Codex in a new Herdr shell. Creating a group or importing an issue does not launch agents.
 _Avoid_: bot, assistant, AI
 
 **Reported status**:
@@ -59,6 +59,19 @@ _Avoid_: workspace, room
 
 **Runtime directory**:
 The ignored `.runtime/` directory that holds the sockets, the isolated Herdr state, and the verification reports.
+
+## Working groups
+
+A **Working group** has a stable ID, name and working directory. Its optional
+members, leader, parent group, instructions, worktree preference, tasks and issue
+sources are saved by `bridge/groups.py` outside Minecraft. The `scripts/workspace`
+CLI and F6 screen use the same operations. A session can belong to multiple groups;
+leaders are group-local. Tasks and issue sources are optional. Local task state
+never changes an external issue. A table stores only a group ID.
+
+A **Group browser** runs in the separate Chromium host. Minecraft's MCEF browser
+renders its local viewer; the real page survives leaving the game. An ordinary
+MCEF browser surface still ends with its world/preview.
 
 ## Relationships
 

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "group": "agent_office",
+  "pattern": [
+    " W ",
+    "WWW",
+    " I "
+  ],
+  "key": {
+    "W": "#minecraft:wool",
+    "I": "minecraft:iron_ingot"
+  },
+  "result": {
+    "id": "modding_workspace:office_chair"
+  }
+}

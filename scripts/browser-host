@@ -1,0 +1,39 @@
+#!/usr/bin/env python3
+"""Start, inspect or stop the persistent office browser (never your normal browser)."""
+import json
+import os
+from pathlib import Path
+import signal
+import sys
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'bridge'))
+from browser_host import ensure
+from groups import ROOT
+
+def main():
+    action=sys.argv[1] if len(sys.argv)>1 else 'status'
+    if action=='start':ensure();print('Office browser running');return
+    if action not in ('status','stop'):raise ValueError('Usage: browser-host start|status|stop')
+    config=json.loads((ROOT/'.runtime/browser-host.json').read_text());pid=int(config['pid'])
+    command=Path(f'/proc/{pid}/cmdline').read_bytes().split(b'\0')
+    if str(ROOT/'browser/host.mjs').encode() not in command:raise ValueError('Saved process is not the office browser host')
+    if action=='stop':
+        # Also handle a host from an older version without a signal handler.
+        children=Path(f'/proc/{pid}/task/{pid}/children').read_text().split()
+        profile=('--user-data-dir='+str(ROOT/'.runtime/browser-profile')).encode()
+        owned=[]
+        for child in children:
+            try:
+                if profile in Path(f'/proc/{child}/cmdline').read_bytes().split(b'\0'):owned.append(int(child))
+            except FileNotFoundError:pass
+        os.kill(pid,signal.SIGTERM)
+        for child in owned:
+            try:
+                if profile in Path(f'/proc/{child}/cmdline').read_bytes().split(b'\0'):os.kill(child,signal.SIGTERM)
+            except ProcessLookupError:pass
+            except FileNotFoundError:pass
+        print('Stopping office browser host')
+    else:print(f'Office browser host running; CDP on 127.0.0.1:{config["cdpPort"]}')
+if __name__=='__main__':
+    try:main()
+    except FileNotFoundError:print('Office browser host is not running')
+    except (OSError,ValueError,KeyError) as e:print(e,file=sys.stderr);raise SystemExit(1)

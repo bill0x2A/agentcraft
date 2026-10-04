@@ -1,0 +1,5 @@
+START window and cached-browser verification
+PASS window moves, resizes its live terminal, and accepts text after resize
+PASS close and reopen preserve the same terminal process and contents
+PASS installed browser reused without download; live GPU frame in 2s
+PASS ALL PASS

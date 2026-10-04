@@ -40,7 +40,7 @@ final class BrowserSurface implements AutoCloseable {
         }
     }
     boolean ready(){return registered && !closed;}
-    String status(){return error!=null?error:initialization.getStage()+" "+(initialization.getPercentage()<0?"":Math.round(initialization.getPercentage())+"%");}
+    String status(){return error!=null?error:BrowserEngine.loadingStatus();}
     void navigate(String url) {
         requestedUrl=url;
         if(browser!=null)browser.getCefBrowser().loadURL(BrowserEngine.resolveUrl(url));

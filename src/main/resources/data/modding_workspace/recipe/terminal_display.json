@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:glass_pane",
+    "minecraft:redstone"
+  ],
+  "result": {
+    "id": "modding_workspace:terminal_display"
+  }
+}

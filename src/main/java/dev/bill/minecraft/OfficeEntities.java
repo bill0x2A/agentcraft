@@ -9,25 +9,40 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 
 public final class OfficeEntities {
     public static final EntityType<AgentMob> CODEX = register("codex", .8F, 1.9F);
-    public static final EntityType<AgentMob> CLAUDE = register("claude", 1.4F, 1.4F);
+    public static final EntityType<AgentMob> CLAUDE = register("claude", .95F, 1.4F); // Collision follows the shell; claws can reach over the desk.
     private static EntityType<AgentMob> register(String name, float width, float height) {
         ResourceKey<EntityType<?>> key = ResourceKey.create(Registries.ENTITY_TYPE, Identifier.fromNamespaceAndPath(ModdingWorkspace.MOD_ID,name));
         return Registry.register(BuiltInRegistries.ENTITY_TYPE,key,
             EntityType.Builder.of(AgentMob::new, MobCategory.MISC).sized(width,height).clientTrackingRange(10).build(key));
     }
     public static final EntityType<BrowserDisplay> BROWSER = registerBrowser();
+    public static final EntityType<BrowserDisplay> MONITOR = registerMonitor();
+    private static EntityType<BrowserDisplay> registerMonitor() {
+        var key = ResourceKey.create(Registries.ENTITY_TYPE, Identifier.fromNamespaceAndPath(ModdingWorkspace.MOD_ID, "desk_monitor"));
+        return Registry.register(BuiltInRegistries.ENTITY_TYPE, key,
+            EntityType.Builder.of(BrowserDisplay::new, MobCategory.MISC).sized(.95F, .7F).clientTrackingRange(8).build(key));
+    }
     private static EntityType<BrowserDisplay> registerBrowser() {
         ResourceKey<EntityType<?>> key = ResourceKey.create(Registries.ENTITY_TYPE, Identifier.fromNamespaceAndPath(ModdingWorkspace.MOD_ID,"browser"));
         return Registry.register(BuiltInRegistries.ENTITY_TYPE,key,
             EntityType.Builder.of(BrowserDisplay::new,MobCategory.MISC).sized(4.2F,2.5F).clientTrackingRange(12).build(key));
     }
+    public static final EntityType<TerminalDisplay> TERMINAL = registerTerminal();
+    private static EntityType<TerminalDisplay> registerTerminal() {
+        ResourceKey<EntityType<?>> key = ResourceKey.create(Registries.ENTITY_TYPE, Identifier.fromNamespaceAndPath(ModdingWorkspace.MOD_ID,"terminal"));
+        return Registry.register(BuiltInRegistries.ENTITY_TYPE,key,
+            EntityType.Builder.of(TerminalDisplay::new,MobCategory.MISC).sized(4.2F,2.5F).clientTrackingRange(12).build(key));
+    }
     public static EntityType<AgentMob> type(String character) { return "claude".equals(character) ? CLAUDE : CODEX; }
     public static void initialize() {
+        FabricDefaultAttributeRegistry.register(MONITOR, Mob.createMobAttributes());
         FabricDefaultAttributeRegistry.register(BROWSER, Mob.createMobAttributes());
-        FabricDefaultAttributeRegistry.register(CODEX, Mob.createMobAttributes());
-        FabricDefaultAttributeRegistry.register(CLAUDE, Mob.createMobAttributes());
+        FabricDefaultAttributeRegistry.register(TERMINAL, Mob.createMobAttributes());
+        FabricDefaultAttributeRegistry.register(CODEX, Mob.createMobAttributes().add(Attributes.MOVEMENT_SPEED, .3).add(Attributes.FOLLOW_RANGE, 48));
+        FabricDefaultAttributeRegistry.register(CLAUDE, Mob.createMobAttributes().add(Attributes.MOVEMENT_SPEED, .3).add(Attributes.FOLLOW_RANGE, 48));
     }
 }

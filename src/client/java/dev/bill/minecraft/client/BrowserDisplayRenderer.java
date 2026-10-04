@@ -13,11 +13,19 @@ import net.minecraft.resources.Identifier;
 
 final class BrowserDisplayRenderer extends EntityRenderer<BrowserDisplay,BrowserDisplayRenderer.State> {
     private static final Identifier FRAME=Identifier.fromNamespaceAndPath("modding_workspace","textures/entity/browser-frame.png");
-    static final class State extends EntityRenderState { float yaw; Identifier texture; }
+    static final class State extends EntityRenderState { float yaw, scale; int frameColor; Identifier texture; }
     BrowserDisplayRenderer(EntityRendererProvider.Context context){super(context);}
     @Override public State createRenderState(){return new State();}
     @Override public void extractRenderState(BrowserDisplay entity,State state,float delta) {
-        super.extractRenderState(entity,state,delta); state.yaw=entity.getYRot(); state.texture=null;
+        super.extractRenderState(entity,state,delta); state.yaw=entity.getYRot(); state.scale=entity.displayScale(); state.texture=null; state.frameColor=0xff172a34;
+        if (entity.displayScale()<1 && entity.level().getBlockState(entity.blockPosition()).getBlock() instanceof dev.bill.minecraft.OfficeFurnitureBlock furniture) {
+            state.frameColor=switch(furniture.style) {
+                case "birch" -> 0xffe8d6ac;
+                case "dark_oak" -> 0xff493325;
+                case "industrial" -> 0xff8b979e;
+                default -> 0xff172a34;
+            };
+        }
         if(BrowserEngine.available()) {
             BrowserSurface surface=BrowserEngine.surface(entity);
             if(surface!=null && surface.ready())state.texture=surface.textureId;
@@ -25,11 +33,11 @@ final class BrowserDisplayRenderer extends EntityRenderer<BrowserDisplay,Browser
     }
     @Override public void submit(State state,PoseStack poses,SubmitNodeCollector collector,CameraRenderState camera) {
         super.submit(state,poses,collector,camera);
-        poses.pushPose(); poses.rotateDegrees(Axis.YP,-state.yaw);
+        poses.pushPose(); poses.rotateDegrees(Axis.YP,-state.yaw); poses.scale(state.scale,state.scale,state.scale);
         // A solid, double-sided bezel remains visible while Chromium initializes.
         collector.submitCustomGeometry(poses,RenderTypes.entityCutout(FRAME),(pose,v)-> {
-            colorQuad(pose,v,-2.1F,0,2.1F,2.5F,.015F,0xff172a34);
-            colorQuad(pose,v,2.1F,0,-2.1F,2.5F,.015F,0xff172a34);
+            colorQuad(pose,v,-2.1F,0,2.1F,2.5F,.015F,state.frameColor);
+            colorQuad(pose,v,2.1F,0,-2.1F,2.5F,.015F,state.frameColor);
             colorQuad(pose,v,-.5F,-.25F,.5F,0,0,0xff304d57);
         });
         if(state.texture!=null)collector.submitCustomGeometry(poses,RenderTypes.entityCutout(state.texture),(pose,v)-> {

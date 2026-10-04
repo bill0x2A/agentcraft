@@ -1,0 +1,6 @@
+START world join regression (no cheats, disposable world)
+PASS Fresh world joins and receives office command tree without Invalid player data
+PASS Player command enters generated studio without cheats
+PASS Saved world rejoins in studio with player dimension and edits preserved
+PASS Player command returns to overworld
+PASS Returning to studio preserves edits; ALL PASS

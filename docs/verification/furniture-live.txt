@@ -1,0 +1,9 @@
+START furniture verification
+PASS five furniture blocks placed; desks link both characters; project membership and monitor identity set
+PASS both characters sit at their assigned work spots
+PASS desk/chair/board interactions open controls; attention makes both agents stand and approach
+PASS attention clears back to seated pose; filing removes mob and frees its desk
+PASS restoration preserves mob and terminal IDs; occupied desk rejects reassignment
+PASS compact monitor renders live Chromium and shares its persistent surface
+PASS world reload preserves desks, chair pose, filed sessions, project membership and monitor address
+PASS restoration after reload and chair/monitor removal work; ALL PASS

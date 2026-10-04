@@ -10,6 +10,14 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 @Pseudo
 @Mixin(targets="net.dimaskama.mcef.impl.MCEFApiImpl", remap=false)
 abstract class McefDefaultsMixin {
+    @ModifyArg(method="<init>", at=@At(value="INVOKE", target="Lme/friwi/jcefmaven/CefAppBuilder;setInstallDir(Ljava/io/File;)V"), index=0, require=1)
+    private java.io.File office$runtimeDirectory(java.io.File original) {
+        String override=System.getProperty("modding.browser.runtimeDir");
+        java.io.File directory=override==null?original:new java.io.File(override);
+        dev.bill.minecraft.ModdingWorkspace.LOGGER.info("Browser engine directory: {}",directory.getAbsolutePath());
+        return directory;
+    }
+
     @ModifyArg(method="<init>", at=@At(value="INVOKE", target="Lme/friwi/jcefmaven/CefAppBuilder;addJcefArgs([Ljava/lang/String;)V"), index=0, require=1)
     private String[] office$browserArguments(String[] arguments) {
         var safe = new java.util.ArrayList<>(Arrays.stream(arguments).filter(value -> !value.equals("--disable-web-security")).toList());

@@ -1,0 +1,20 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "modding_workspace:block/dark_oak_filing_cabinet",
+      "y": 0
+    },
+    "facing=east": {
+      "model": "modding_workspace:block/dark_oak_filing_cabinet",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "modding_workspace:block/dark_oak_filing_cabinet",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "modding_workspace:block/dark_oak_filing_cabinet",
+      "y": 270
+    }
+  }
+}

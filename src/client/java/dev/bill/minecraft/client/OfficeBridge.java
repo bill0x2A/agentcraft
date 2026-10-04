@@ -35,7 +35,7 @@ final class OfficeBridge {
         return request(request).thenApply(response -> JSON.fromJson(response.get("session"), Session.class));
     }
 
-    private static CompletableFuture<JsonObject> request(JsonObject message) {
+    static CompletableFuture<JsonObject> request(JsonObject message) {
         return CompletableFuture.supplyAsync(() -> {
             try (SocketChannel channel = SocketChannel.open(StandardProtocolFamily.UNIX)) {
                 var timeout = TIMEOUT.schedule(() -> { try { channel.close(); } catch (IOException ignored) {} }, 12, TimeUnit.SECONDS);
@@ -55,7 +55,7 @@ final class OfficeBridge {
                                 return response;
                             }
                             line.write(b);
-                            if (line.size() > 1024 * 1024) throw new IOException("Office response too large");
+                            if (line.size() > 16 * 1024 * 1024) throw new IOException("Office response too large");
                         }
                         buffer.clear();
                     }

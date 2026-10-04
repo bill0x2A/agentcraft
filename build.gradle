@@ -13,12 +13,35 @@ loom {
     runs {
         client {
             runDir 'run'
+            // Share the pinned native engine across development/verification game directories.
+            vmArg "-Dmodding.browser.runtimeDir=${projectDir}/.tools/browser/jcef-${project.mcef_modern_version}"
             if (project.hasProperty('browserControl')) vmArg '-Dmodding.browser.debugPort=9222'
             if (project.hasProperty('officeVerification')) {
                 runDir 'run-office-test'
                 vmArg '-Dmodding.office.verify=true'
                 vmArg "-Dmodding.terminal.socket=${projectDir}/.runtime/office-test.sock"
                 if (project.hasProperty('agentVerification')) vmArg '-Dmodding.office.verifyAgents=true'
+            }
+            if (project.hasProperty('workspaceVerification')) {
+                runDir 'run-workspace-test'
+                vmArg '-Dmodding.workspace.verify=true'
+                vmArg "-Dmodding.terminal.socket=${projectDir}/.runtime/workspace-test.sock"
+            }
+            if (project.hasProperty('worldJoinVerification')) {
+                runDir 'run-join-test'
+                vmArg '-Dmodding.worldJoin.verify=true'
+            }
+            if (project.hasProperty('windowVerification')) {
+                runDir 'run-window-test'
+                vmArg '-Dmodding.window.verify=true'
+            }
+            if (project.hasProperty('furnitureVerification')) {
+                runDir 'run-furniture-test'
+                vmArg '-Dmodding.office.verifyFurniture=true'
+            }
+            if (project.hasProperty('attentionVerification')) {
+                runDir 'run-attention-test'
+                vmArg '-Dmodding.office.verifyAttention=true'
             }
             if (project.hasProperty('browserVerification')) {
                 runDir 'run-browser-test'

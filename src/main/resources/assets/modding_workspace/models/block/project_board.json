@@ -1,0 +1,357 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "wood": "minecraft:block/spruce_planks",
+    "edge": "minecraft:block/stripped_spruce_log",
+    "metal": "minecraft:block/iron_block",
+    "dark": "minecraft:block/black_concrete",
+    "teal": "minecraft:block/cyan_wool",
+    "paper": "minecraft:block/white_concrete",
+    "cork": "minecraft:block/stripped_oak_log",
+    "copper": "minecraft:block/copper_block",
+    "yellow": "minecraft:block/yellow_concrete",
+    "green": "minecraft:block/lime_concrete",
+    "particle": "minecraft:block/spruce_planks"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        6,
+        7
+      ],
+      "to": [
+        16,
+        24,
+        10
+      ],
+      "faces": {
+        "north": {
+          "texture": "#copper"
+        },
+        "south": {
+          "texture": "#copper"
+        },
+        "east": {
+          "texture": "#copper"
+        },
+        "west": {
+          "texture": "#copper"
+        },
+        "up": {
+          "texture": "#copper"
+        },
+        "down": {
+          "texture": "#copper"
+        }
+      }
+    },
+    {
+      "from": [
+        1,
+        7,
+        6.8
+      ],
+      "to": [
+        15,
+        23,
+        7
+      ],
+      "faces": {
+        "north": {
+          "texture": "#cork"
+        },
+        "south": {
+          "texture": "#cork"
+        },
+        "east": {
+          "texture": "#cork"
+        },
+        "west": {
+          "texture": "#cork"
+        },
+        "up": {
+          "texture": "#cork"
+        },
+        "down": {
+          "texture": "#cork"
+        }
+      }
+    },
+    {
+      "from": [
+        6,
+        1,
+        7
+      ],
+      "to": [
+        10,
+        6,
+        10
+      ],
+      "faces": {
+        "north": {
+          "texture": "#edge"
+        },
+        "south": {
+          "texture": "#edge"
+        },
+        "east": {
+          "texture": "#edge"
+        },
+        "west": {
+          "texture": "#edge"
+        },
+        "up": {
+          "texture": "#edge"
+        },
+        "down": {
+          "texture": "#edge"
+        }
+      }
+    },
+    {
+      "from": [
+        2,
+        0,
+        4
+      ],
+      "to": [
+        14,
+        2,
+        13
+      ],
+      "faces": {
+        "north": {
+          "texture": "#edge"
+        },
+        "south": {
+          "texture": "#edge"
+        },
+        "east": {
+          "texture": "#edge"
+        },
+        "west": {
+          "texture": "#edge"
+        },
+        "up": {
+          "texture": "#edge"
+        },
+        "down": {
+          "texture": "#edge"
+        }
+      }
+    },
+    {
+      "from": [
+        2,
+        9,
+        6.5
+      ],
+      "to": [
+        7,
+        11,
+        6.8
+      ],
+      "faces": {
+        "north": {
+          "texture": "#yellow"
+        },
+        "south": {
+          "texture": "#yellow"
+        },
+        "east": {
+          "texture": "#yellow"
+        },
+        "west": {
+          "texture": "#yellow"
+        },
+        "up": {
+          "texture": "#yellow"
+        },
+        "down": {
+          "texture": "#yellow"
+        }
+      }
+    },
+    {
+      "from": [
+        2,
+        15,
+        6.5
+      ],
+      "to": [
+        7,
+        17,
+        6.8
+      ],
+      "faces": {
+        "north": {
+          "texture": "#yellow"
+        },
+        "south": {
+          "texture": "#yellow"
+        },
+        "east": {
+          "texture": "#yellow"
+        },
+        "west": {
+          "texture": "#yellow"
+        },
+        "up": {
+          "texture": "#yellow"
+        },
+        "down": {
+          "texture": "#yellow"
+        }
+      }
+    },
+    {
+      "from": [
+        2,
+        20,
+        6.5
+      ],
+      "to": [
+        7,
+        22,
+        6.8
+      ],
+      "faces": {
+        "north": {
+          "texture": "#paper"
+        },
+        "south": {
+          "texture": "#paper"
+        },
+        "east": {
+          "texture": "#paper"
+        },
+        "west": {
+          "texture": "#paper"
+        },
+        "up": {
+          "texture": "#paper"
+        },
+        "down": {
+          "texture": "#paper"
+        }
+      }
+    },
+    {
+      "from": [
+        9,
+        9,
+        6.5
+      ],
+      "to": [
+        14,
+        11,
+        6.8
+      ],
+      "faces": {
+        "north": {
+          "texture": "#green"
+        },
+        "south": {
+          "texture": "#green"
+        },
+        "east": {
+          "texture": "#green"
+        },
+        "west": {
+          "texture": "#green"
+        },
+        "up": {
+          "texture": "#green"
+        },
+        "down": {
+          "texture": "#green"
+        }
+      }
+    },
+    {
+      "from": [
+        9,
+        15,
+        6.5
+      ],
+      "to": [
+        14,
+        17,
+        6.8
+      ],
+      "faces": {
+        "north": {
+          "texture": "#green"
+        },
+        "south": {
+          "texture": "#green"
+        },
+        "east": {
+          "texture": "#green"
+        },
+        "west": {
+          "texture": "#green"
+        },
+        "up": {
+          "texture": "#green"
+        },
+        "down": {
+          "texture": "#green"
+        }
+      }
+    },
+    {
+      "from": [
+        9,
+        20,
+        6.5
+      ],
+      "to": [
+        14,
+        22,
+        6.8
+      ],
+      "faces": {
+        "north": {
+          "texture": "#paper"
+        },
+        "south": {
+          "texture": "#paper"
+        },
+        "east": {
+          "texture": "#paper"
+        },
+        "west": {
+          "texture": "#paper"
+        },
+        "up": {
+          "texture": "#paper"
+        },
+        "down": {
+          "texture": "#paper"
+        }
+      }
+    }
+  ],
+  "display": {
+    "gui": {
+      "rotation": [
+        30,
+        225,
+        0
+      ],
+      "translation": [
+        0,
+        -1,
+        0
+      ],
+      "scale": [
+        0.6,
+        0.6,
+        0.6
+      ]
+    }
+  }
+}

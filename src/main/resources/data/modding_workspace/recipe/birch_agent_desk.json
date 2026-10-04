@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "group": "agent_office_finishes",
+  "ingredients": [
+    "modding_workspace:agent_desk",
+    "minecraft:birch_planks"
+  ],
+  "result": {
+    "id": "modding_workspace:birch_agent_desk"
+  }
+}

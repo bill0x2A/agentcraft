@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "group": "agent_office_finishes",
+  "ingredients": [
+    "modding_workspace:monitor",
+    "minecraft:dark_oak_planks"
+  ],
+  "result": {
+    "id": "modding_workspace:dark_oak_monitor"
+  }
+}

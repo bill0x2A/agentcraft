@@ -6,6 +6,7 @@ run/
 run-server/
 run-office-test/
 run-browser-test/
+run-attention-test/
 .idea/
 *.iml
 .classpath
@@ -17,3 +18,9 @@ replay_pid*
 .env
 .runtime/
 __pycache__/
+run-window-test/
+
+run-furniture-test/
+
+run-workspace-test/
+run-join-test/

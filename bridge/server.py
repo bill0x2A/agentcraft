@@ -23,7 +23,7 @@ def rpc(method, params=None):
     return response['result']
 
 
-def handle(client, terminal):
+def handle(client, terminal, takeover=False):
     upstream = socket.socket(socket.AF_UNIX)
     reader = None
     lock = threading.Lock()
@@ -40,7 +40,7 @@ def handle(client, terminal):
         if not welcome or welcome.get('version') != protocol.PROTOCOL or welcome.get('error'):
             raise RuntimeError(f'Expected Herdr protocol 20: {welcome}')
         upstream.settimeout(None)
-        protocol.send(upstream, protocol.attach(terminal))
+        protocol.send(upstream, protocol.attach(terminal, takeover))
         emit(dict(type='connected', terminal=terminal))
 
         def read_frames():
@@ -96,17 +96,22 @@ def dispatch(client, default_terminal):
         client.settimeout(8)
         # Unbuffered: do not swallow keyboard messages queued after the handshake.
         with client.makefile('rb', buffering=0) as reader:
-            line = reader.readline(4097)
-        if len(line) > 4096:
+            line = reader.readline(65537)
+        if len(line) > 65536:
             raise ValueError('Office request too large')
         request = json.loads(line)
         kind = request['type']
         if kind == 'attach':
             terminal = require_terminal(request.get('terminal') or default_terminal)
             client.settimeout(None)
-            handle(client, terminal)
+            handle(client, terminal, request.get("takeover") is True)
             return
-        if kind == 'sessions':
+        if kind == 'capabilities':
+            response = dict(type='capabilities', version=2, features=['workspace','terminal-handoff'])
+        elif kind == 'workspace':
+            import groups
+            response = dict(type='workspace', **groups.dispatch(request['op'], request.get('args', {})))
+        elif kind == 'sessions':
             response = dict(type='sessions', sessions=sessions())
         elif kind == 'create':
             response = dict(type='session', session=create(request.get('label')))

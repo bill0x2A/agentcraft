@@ -1,7 +1,10 @@
 #!/usr/bin/env node
 // Dependency-free CDP helper for the explicitly enabled, loopback-only office browser.
-const endpoint = 'http://127.0.0.1:9222';
-const [command = 'list', targetId, ...args] = process.argv.slice(2);
+const argv=process.argv.slice(2);
+const persistent=argv[0]==='--persistent';if(persistent)argv.shift();
+const port=persistent?'9333':'9222';
+const endpoint = 'http://127.0.0.1:'+port;
+const [command = 'list', targetId, ...args] = argv;
 async function main() {
   const response = await fetch(`${endpoint}/json/list`, {signal: AbortSignal.timeout(5000)});
   if (!response.ok) throw new Error(`Chromium returned HTTP ${response.status}`);
@@ -15,7 +18,7 @@ async function main() {
   const target = targets.find(t => t.id === targetId);
   if (!target) throw new Error('That browser target no longer exists. Run scripts/browser list again.');
   const socketUrl = new URL(target.webSocketDebuggerUrl);
-  if (socketUrl.hostname !== '127.0.0.1' || socketUrl.port !== '9222' || socketUrl.protocol !== 'ws:')
+  if (socketUrl.hostname !== '127.0.0.1' || socketUrl.port !== port || socketUrl.protocol !== 'ws:')
     throw new Error('Refusing a DevTools socket outside the local office endpoint');
   let method, params;
   if (command === 'navigate') {

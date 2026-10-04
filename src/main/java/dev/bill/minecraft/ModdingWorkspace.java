@@ -11,6 +11,9 @@ public final class ModdingWorkspace implements ModInitializer {
     @Override
     public void onInitialize() {
         OfficeEntities.initialize();
+        OfficeItems.initialize();
+        OfficeBlocks.initialize();
+        Studio.register();
         LOGGER.info("Minecraft modding workspace ready.");
     }
 }

@@ -109,5 +109,15 @@ final class AgentModel extends EntityModel<AgentRenderState> {
             case OFFLINE -> { head.xRot=.4F; rig.y=.5F; leftEye.yScale=rightEye.yScale=.08F; }
             case UNKNOWN -> { head.zRot=.1F; leftEye.yScale=rightEye.yScale=.7F; }
         }
+        if (state.seated) {
+            rig.y += claude ? 2 : 8;
+            if (!claude) {
+                rig.getChild("left_leg").xRot = -1.45F;
+                rig.getChild("right_leg").xRot = -1.45F;
+            } else {
+                for (String side : new String[]{"left", "right"}) for (int i=0; i<3; i++)
+                    rig.getChild(side+"_leg_"+i).zRot = side.equals("left") ? -.35F : .35F;
+            }
+        }
     }
 }

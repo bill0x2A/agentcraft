@@ -33,6 +33,6 @@ final class AgentRenderer extends MobRenderer<AgentMob, AgentRenderState, AgentM
         return Identifier.fromNamespaceAndPath(ModdingWorkspace.MOD_ID,"textures/entity/"+character+"_"+state.activity.name().toLowerCase(Locale.ROOT)+".png");
     }
     @Override public void extractRenderState(AgentMob mob,AgentRenderState state,float partialTicks) {
-        super.extractRenderState(mob,state,partialTicks); state.activity=mob.activity();
+        super.extractRenderState(mob,state,partialTicks); state.activity=mob.activity(); state.seated=mob.seated();
     }
 }

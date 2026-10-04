@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:paper",
+    "minecraft:red_dye"
+  ],
+  "result": {
+    "id": "modding_workspace:dismissal_slip"
+  }
+}

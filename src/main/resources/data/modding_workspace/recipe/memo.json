@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:paper",
+    "minecraft:feather"
+  ],
+  "result": {
+    "id": "modding_workspace:memo"
+  }
+}

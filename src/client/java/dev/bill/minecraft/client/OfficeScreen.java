@@ -38,7 +38,9 @@ final class OfficeScreen extends Screen {
         addRenderableWidget(Button.builder(Component.literal("Create + link"), button -> create())
             .bounds(left+w-96, 51, 96, 20).build()).active = !busy;
         addRenderableWidget(Button.builder(Component.literal("Place browser screen"), b -> BrowserEngine.place(minecraft,this))
-            .bounds(left,77,w,20).build()).active = !busy && BrowserEngine.available();
+            .bounds(left,77,w/2-2,20).build()).active = !busy && BrowserEngine.available();
+        addRenderableWidget(Button.builder(Component.literal("Place terminal display"), b -> TerminalDisplays.placeAhead(minecraft,this))
+            .bounds(left+w/2+2,77,w-w/2-2,20).build()).active = !busy;
         displayed = OfficeClient.sessions;
         displayedError = OfficeClient.error;
         int maxPage = Math.max(0, (displayed.size()-1)/perPage); page = Math.min(page, maxPage);

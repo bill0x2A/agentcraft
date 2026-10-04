@@ -23,3 +23,18 @@ page rendering, click/type/scroll, navigation, DOM queries and close/reopen were
 nevertheless verified. Video acceleration/codecs and arbitrary sites were not
 validated. Wheel input uses CEF's in-process Input.dispatchMouseEvent because
 the upstream AWT wheel path did not scroll here. No desktop Chrome mirroring.
+
+Furniture live test: both characters sit, stand for attention, and return to their
+chairs; desks, chairs and boards route interactions; filing frees a desk; restore
+preserves mob/terminal IDs; compact monitor renders Chromium. World reload
+preserves desk, chair, filing, project and monitor data. Chair/monitor removal
+checked. Used synthetic terminal IDs in a disposable world. See furniture-live.txt.
+
+workspace-live.txt: shared groups, the imported studio, terminals, persistent group browsers and source-scoped issues. Screenshots: docs/images/workspace-*.png.
+
+world-join-live.txt (4 October 2026): regression for the /office permission
+predicate throwing on Minecraft's serverless command-tree probe. A separate
+run-join-test client joins a new world without cheats, sends the real studio
+command, saves/reloads in the studio, returns to the overworld, and re-enters
+without rebuilding over a placed block. All checks pass. No normal world or
+player data is edited. Reproduce: ./scripts/mc client -PworldJoinVerification.

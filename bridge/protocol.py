@@ -98,8 +98,8 @@ def hello(cols, rows):
     return b''.join(uint(x) for x in [0, PROTOCOL, cols, rows, 0, 0, 0, 0, 2])
 
 
-def attach(terminal):
-    return uint(5) + string(terminal) + b'\x00'  # Never steal another controller.
+def attach(terminal, takeover=False):
+    return uint(5) + string(terminal) + bytes([bool(takeover)])  # Only a focused, explicit open may take control.
 
 
 def input_message(event):

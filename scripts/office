@@ -1,0 +1,94 @@
+#!/usr/bin/env python3
+"""Launch the modded game or the normal Herdr UI against this office's sessions."""
+import fcntl
+import json
+import os
+from pathlib import Path
+import socket
+import struct
+import signal
+import subprocess
+import sys
+import time
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / 'bridge'))
+import runtime
+
+
+def bridge_ready():
+    try:
+        with socket.socket(socket.AF_UNIX) as connection:
+            connection.settimeout(2)
+            connection.connect(str(runtime.RUNTIME / 'terminal.sock'))
+            connection.sendall(b'{"type":"capabilities"}\n')
+            with connection.makefile('rb') as reader:
+                return json.loads(reader.readline(2 * 1024 * 1024)).get('version') == 2
+    except (OSError, ValueError):
+        return False
+
+
+def retire_old_bridge():
+    """Upgrade this bridge only. Never stop Herdr or its terminals."""
+    try:
+        with socket.socket(socket.AF_UNIX) as connection:
+            connection.connect(str(runtime.RUNTIME / 'terminal.sock'))
+            pid, uid, _ = struct.unpack('3i',connection.getsockopt(socket.SOL_SOCKET,socket.SO_PEERCRED,12))
+            if uid != os.getuid(): raise RuntimeError('Bridge belongs to another user')
+            argv=Path(f'/proc/{pid}/cmdline').read_bytes().decode().split('\0')
+            cwd=Path(f'/proc/{pid}/cwd').resolve()
+            if not any((cwd / arg).resolve() == ROOT/'bridge/server.py' for arg in argv[1:] if arg):
+                raise RuntimeError('Unrecognised process owns the bridge socket; refusing to stop it')
+            os.kill(pid,signal.SIGTERM)
+        for _ in range(30):
+            try:
+                with socket.socket(socket.AF_UNIX) as probe: probe.connect(str(runtime.RUNTIME/'terminal.sock'))
+            except (FileNotFoundError,ConnectionRefusedError): return
+            time.sleep(.1)
+        raise RuntimeError('Old bridge did not stop')
+    except (FileNotFoundError,ConnectionRefusedError): return
+
+
+def main():
+    action = sys.argv[1] if len(sys.argv) > 1 else '--help'
+    if action in ('--help', '-h'):
+        print('Usage: scripts/office start | restart-bridge | game [Gradle arguments] | herdr [Herdr arguments] | groups <workspace arguments>')
+        return
+    if action == 'groups':
+        os.execv(str(ROOT / 'scripts/workspace'), ['workspace', *sys.argv[2:]])
+    if action not in ('start', 'restart-bridge', 'game', 'herdr'):
+        raise SystemExit('Expected game or herdr; see scripts/office --help')
+    runtime.RUNTIME.mkdir(mode=0o700, exist_ok=True)
+    with (runtime.RUNTIME / 'launcher.lock').open('a') as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        runtime.start()
+        if action == 'game':
+            import browser_host
+            try: browser_host.ensure()
+            except ValueError as e: print(f'Group browser: {e}', file=sys.stderr)
+        if action == 'restart-bridge': retire_old_bridge()
+        if action in ('game', 'start', 'restart-bridge') and not bridge_ready():
+            retire_old_bridge()
+            with (runtime.RUNTIME / 'terminal.log').open('ab', buffering=0) as log:
+                process = subprocess.Popen([sys.executable, str(ROOT / 'bridge/server.py')],
+                    cwd=ROOT, stdin=subprocess.DEVNULL, stdout=log, stderr=log,
+                    start_new_session=True)
+            for _ in range(50):
+                if bridge_ready():
+                    break
+                if process.poll() is not None:
+                    raise SystemExit('Bridge failed to start; see .runtime/terminal.log')
+                time.sleep(.1)
+            else:
+                raise SystemExit('Bridge not ready; see .runtime/terminal.log')
+    if action in ('start', 'restart-bridge'):
+        print('Office sessions and group bridge are ready.'); return
+    os.chdir(ROOT)
+    sys.stdout.flush()
+    if action == 'herdr':
+        os.execvpe('herdr', ['herdr', *sys.argv[2:]], runtime.environment())
+    os.execv(str(ROOT / 'scripts/mc'), ['mc', 'client', '-PbrowserControl', *sys.argv[2:]])
+
+
+if __name__ == '__main__':
+    main()

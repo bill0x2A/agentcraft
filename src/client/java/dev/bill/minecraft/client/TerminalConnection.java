@@ -23,9 +23,13 @@ final class TerminalConnection implements AutoCloseable {
     volatile String status = "Connecting to herdr…";
     volatile Frame frame;
     volatile long framesReceived;
+    volatile int cols, rows; // Last size this viewer asked for; 0 until a resize is sent.
 
-    TerminalConnection(Path socket, String terminal) {
+    TerminalConnection(Path socket, String terminal) { this(socket, terminal, false); }
+
+    TerminalConnection(Path socket, String terminal, boolean takeover) {
         JsonObject attach = event("attach");
+        attach.addProperty("takeover", takeover);
         if (terminal != null) attach.addProperty("terminal", terminal);
         send(attach);
         Thread.ofVirtual().name("minecraft-herdr-read").start(() -> connect(socket));
@@ -89,7 +93,11 @@ final class TerminalConnection implements AutoCloseable {
         }
     }
 
+    boolean closed() { return closed; }
+    boolean attached() { return framesReceived > 0 || status.startsWith("LIVE"); }
+
     void send(JsonObject message) {
+        if (message.get("type").getAsString().equals("resize")) { cols = message.get("cols").getAsInt(); rows = message.get("rows").getAsInt(); }
         if (!closed && !outgoing.offer(message.toString() + "\n")) {
             status = "Input queue full — disconnected to prevent missing keystrokes";
             close();

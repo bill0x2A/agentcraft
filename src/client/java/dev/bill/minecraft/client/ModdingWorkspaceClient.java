@@ -10,10 +10,18 @@ public final class ModdingWorkspaceClient implements ClientModInitializer {
     public void onInitializeClient() {
         ModdingWorkspace.LOGGER.info("Minecraft modding client ready.");
         OfficeClient.register();
+        WorkspaceClient.register();
+        if(Boolean.getBoolean("modding.worldJoin.verify")) WorldJoinVerification.register();
+        if(Boolean.getBoolean("modding.workspace.verify")) WorkspaceVerification.register();
+        FurnitureClient.register();
+        if (Boolean.getBoolean("modding.office.verifyFurniture")) FurnitureVerification.register();
         AgentRenderer.register();
+        if (Boolean.getBoolean("modding.window.verify")) WindowVerification.register();
         net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry.register(dev.bill.minecraft.OfficeEntities.BROWSER, BrowserDisplayRenderer::new);
+        net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry.register(dev.bill.minecraft.OfficeEntities.MONITOR, BrowserDisplayRenderer::new);
         if (net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("mcef-modern")) BrowserEngine.register();
         if (Boolean.getBoolean("modding.office.verify")) OfficeVerification.register();
+        if (Boolean.getBoolean("modding.office.verifyAttention")) AttentionVerification.register();
         if (Boolean.getBoolean("modding.browser.verify")) BrowserVerification.register();
         boolean[] held = {false};
         boolean[] autoOpened = {false};

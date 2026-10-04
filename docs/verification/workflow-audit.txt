@@ -1,0 +1,77 @@
+Workflow audit, 2026-10-03
+
+Objective: Create and test our AgentCraft-derived Minecraft workflow.
+This is a selective local integration, not a published GitHub fork.
+
+Requirements and inspected evidence:
+
+1. Keep Claude crab/Codex robot and resting/working/attention behavior.
+   AgentModel, AgentRenderer, AgentMob and OfficeWorld retain both characters.
+   office-verification and attention-verification reports cover reported status
+   transitions for both. Furniture live report covers seated/resting, attention
+   approach and return. workspace-mobs.png shows both in the imported studio.
+
+2. Use the generated AgentCraft studio as the base.
+   Studio.java invokes adapted StudioHqBuilder in a separate dimension, with a
+   persisted generation marker. workspace-live.txt and workspace-studio.png show
+   live generation. Attribution pins upstream revision in licenses/AgentCraft-origin.txt.
+
+3. Start working groups quickly without requiring issues or tasks.
+   groups.py creates a name/cwd group with empty members/tasks/sources. Unit tests
+   and test_group_live.py verify no tracker dependency. WorkspaceScreen exposes
+   New group. No agent starts from creation or issue import.
+
+4. Flexible teams, optional leaders, nested groups, optional worktrees.
+   Membership and leadership are group-local; tests cover multiple memberships,
+   reassignment cleanup, subgroup cycles and inherited directories. Agent context
+   exposes roles, leader and worktree preference, not a forced scheduler.
+   workspace CLI provides formation, launch, context and explicit message sending.
+
+5. Multiple sets of agents in different buildings.
+   ProjectBoardEntity and imported StationBlockEntity bind stable group IDs;
+   WorkspaceBoardRenderer renders the corresponding group's members/tasks.
+   OfficeWorld persists each mob's dimension/home. The studio live test renders
+   linked board/wall; the furniture test verifies world reload persistence.
+
+6. Real terminal windows and synchronization with normal Herdr.
+   Herdr owns the process; TerminalScreen is movable/resizable. Window live report
+   verifies input, resize and reconnect. test_handoff.py checks exclusive control,
+   passive viewer refusal and explicit takeover preserving PID and contents.
+   scripts/office herdr uses the same socket/state as the game. test_group_live.py
+   verifies the group CLI inside a real shell. External terminal CLI uses the same
+   locked group file as bridge requests; concurrency tests detect lost writes.
+
+7. Browser displays for observing and interacting with agent work.
+   BrowserSurface/MCEF renders displays; browser host owns persistent group pages.
+   Live game report verifies streamed Chromium frames. browser/verify.mjs verified
+   real input and JavaScript state continuing after game exit. Viewer requests use
+   local capability URLs; group browser is accessible outside Minecraft too.
+
+8. Select relevant Linear projects/GitHub repositories for each group and import
+   only chosen issues, while allowing work without trackers.
+   groups.py stores per-group sources and deduplicates imports; tests cover scope
+   rejection, disconnect preservation and independent local status. GitHub public
+   import verified with a real issue. Linear HTTP contract tested with fixtures;
+   queries validated against official published schema. Authenticated account
+   browsing and issue import verified on 2026-10-04 after .env configuration.
+   No external tracker writes
+   are claimed or implemented; imported tasks have local status/assignments.
+
+Build and checks:
+   Gradle build passed; current changes since that build are Python/CLI/docs only.
+   15 Python regression tests pass; live group shell test passes.
+   Python compilation and git diff whitespace checks pass.
+
+Verification boundaries:
+   Real Claude/Codex launch is not covered by fixtures; CLI tools retain their own
+   login/trust/approval flows. Earlier user demonstrated Codex in-game manually.
+   No remote fork, publication or deployment performed.
+
+2026-10-04 final account check:
+   Authenticated Linear project catalog and project-scoped issue browse pass.
+   Selected issue imported into disposable local group data with description/link
+   preserved; importing twice retains the same task and its local status.
+   Connector credentials now read from ignored .env as literal values, with
+   environment overrides. 17 regression tests pass, including credential parsing
+   and rejection errors that do not expose secrets. The bridge has been reloaded
+   without stopping Herdr sessions. No external tracker data was changed.

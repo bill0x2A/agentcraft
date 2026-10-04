@@ -22,6 +22,9 @@ final class BrowserEngine {
     private static boolean held, previewOpened;
     private static MCEFApi.Initialization initialization;
     private static ClientLevel world;
+    private static long initializationStarted, lastProgressAt;
+    private static MCEFApi.Initialization.Stage lastStage;
+    private static int lastPercent=-2;
     private static final Map<UUID,BrowserSurface> SURFACES=new HashMap<>();
     static boolean available(){return FabricLoader.getInstance().isModLoaded("mcef-modern");}
     static void register() {
@@ -63,6 +66,7 @@ final class BrowserEngine {
     }
     static MCEFApi.Initialization initialize() {
         if(initialization==null) {
+            initializationStarted=lastProgressAt=System.nanoTime();
             initialization=MCEFApi.initialize();
             initialization.getFuture().whenComplete((api,error)-> {
                 if(error==null)ModdingWorkspace.LOGGER.info("MCEF browser engine ready");
@@ -71,6 +75,34 @@ final class BrowserEngine {
         }
         return initialization;
     }
+    static String loadingStatus() {
+        if(initialization==null)return "Preparing browser…";
+        var stage=initialization.getStage();
+        int percent=Math.round(initialization.getPercentage());
+        long now=System.nanoTime();
+        if(stage!=lastStage || percent!=lastPercent) {
+            if(stage!=lastStage)ModdingWorkspace.LOGGER.info("Browser initialization: {} ({}%)",stage,percent);
+            lastStage=stage;lastPercent=percent;lastProgressAt=now;
+        }
+        long seconds=(now-initializationStarted)/1_000_000_000L;
+        String label=switch(stage) {
+            case NOT_STARTED -> "Checking installed browser";
+            case DOWNLOADING -> "Downloading browser engine (first use)";
+            case EXTRACTING -> "Unpacking browser engine";
+            case INSTALL -> "Installing browser engine";
+            case INITIALIZING -> "Starting Chromium";
+            case DONE -> "Opening page";
+        };
+        return label+(percent>=0 && stage!=MCEFApi.Initialization.Stage.DONE?" · "+percent+"%":"")+" · "+seconds+"s";
+    }
+    static String loadingHint() {
+        if(initialization==null)return "";
+        if(System.nanoTime()-lastProgressAt>60_000_000_000L)return "No progress reported for over a minute. Check your connection; you can close this view while it finishes.";
+        return initialization.getStage()==MCEFApi.Initialization.Stage.DOWNLOADING
+            ?"The first download is large. Later launches reuse the installed engine. You can close this view while it finishes."
+            :"You can close this view and return when the browser is ready.";
+    }
+
     static String normalizeUrl(String input) {
         String url=input.strip();
         if(url.equals("office:home"))return url;
@@ -107,6 +139,20 @@ final class BrowserEngine {
         if(!level.addFreshEntity(display))throw new IllegalStateException("Could not place monitor");
         return display;
     }
+    static BrowserDisplay placeMonitor(ServerPlayer player, BlockPos pos) {
+        var level = player.level();
+        var state = level.getBlockState(pos);
+        if (!OfficeBlocks.is(state, OfficeFurnitureBlock.Kind.MONITOR)) throw new IllegalStateException("The monitor was removed");
+        for (var display : level.getEntitiesOfClass(BrowserDisplay.class, new net.minecraft.world.phys.AABB(pos).inflate(1)))
+            if (pos.equals(display.anchor())) return display;
+        BrowserDisplay display = OfficeEntities.MONITOR.create(level, EntitySpawnReason.COMMAND);
+        if (display == null) throw new IllegalStateException("Could not start monitor");
+        display.anchor(pos);
+        display.snapTo(pos.getX()+.5, pos.getY()+.2, pos.getZ()+.5, state.getValue(OfficeFurnitureBlock.FACING).getOpposite().toYRot(), 0);
+        if (!level.addFreshEntity(display)) throw new IllegalStateException("Could not start monitor");
+        return display;
+    }
+
     static void place(Minecraft client,OfficeScreen screen) {
         if(!OfficeClient.localWorld(client))return;
         var server=client.getSingleplayerServer();UUID player=client.player.getUUID();
@@ -123,7 +169,10 @@ final class BrowserEngine {
         var client=Minecraft.getInstance();var server=client.getSingleplayerServer();
         if(!OfficeClient.localWorld(client))return;
         var dimension=display.level().dimension();UUID id=display.getUUID();
-        server.execute(()->{var level=server.getLevel(dimension);if(level!=null && level.getEntity(id) instanceof BrowserDisplay monitor)monitor.discard();});
+        server.execute(()->{var level=server.getLevel(dimension);if(level!=null && level.getEntity(id) instanceof BrowserDisplay monitor) {
+            if (monitor.anchor() != null && OfficeBlocks.is(level.getBlockState(monitor.anchor()), OfficeFurnitureBlock.Kind.MONITOR)) level.removeBlock(monitor.anchor(), false);
+            monitor.discard();
+        }});
     }
     static final String PAGE="""
         <!doctype html><html><meta charset="utf-8"><title>Agent Office</title><style>

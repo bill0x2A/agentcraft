@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "group": "agent_office",
+  "pattern": [
+    "PPP",
+    " I ",
+    "P P"
+  ],
+  "key": {
+    "P": "#minecraft:planks",
+    "I": "minecraft:iron_ingot"
+  },
+  "result": {
+    "id": "modding_workspace:agent_desk"
+  }
+}

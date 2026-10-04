@@ -33,9 +33,10 @@ final class OfficeClient {
             if (OfficeWorld.binding(entity.getUUID()) == null) return InteractionResult.PASS;
             Minecraft client = Minecraft.getInstance();
             if (!localWorld(client)) return InteractionResult.PASS;
-            if (level.isClientSide()) openMob(client, entity.getUUID());
+            if (level.isClientSide() && !OfficeTools.useOnMob(client, player, entity.getUUID())) openMob(client, entity.getUUID());
             return InteractionResult.SUCCESS;
         });
+        OfficeTools.register();
     }
 
     static void refresh(Minecraft client) {
@@ -93,6 +94,23 @@ final class OfficeClient {
                     if (client.getSingleplayerServer() == server) {
                         if (client.gui.screen() == screen) screen.onClose();
                         message(client, "Created " + binding.label()+". Right-click the mob to resume its terminal.");
+                    }
+                });
+            } catch (Exception e) { client.execute(() -> screen.finished(e.getMessage())); }
+        });
+    }
+
+    static void rename(Minecraft client, UUID mob, String label, RenameScreen screen) {
+        var server = client.getSingleplayerServer();
+        if (!localWorld(client)) { screen.finished("Open a private single-player world first"); return; }
+        server.execute(() -> {
+            try {
+                OfficeWorld.Binding binding = OfficeWorld.rename(server, mob, label);
+                client.execute(() -> {
+                    if (client.getSingleplayerServer() == server) {
+                        if (client.gui.screen() == screen) screen.onClose();
+                        message(client, "Renamed to " + binding.label() + ".");
+                        TerminalDisplays.renamed(client, binding.terminal());
                     }
                 });
             } catch (Exception e) { client.execute(() -> screen.finished(e.getMessage())); }

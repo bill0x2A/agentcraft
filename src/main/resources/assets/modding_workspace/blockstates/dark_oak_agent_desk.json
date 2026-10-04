@@ -1,0 +1,20 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "modding_workspace:block/dark_oak_agent_desk",
+      "y": 0
+    },
+    "facing=east": {
+      "model": "modding_workspace:block/dark_oak_agent_desk",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "modding_workspace:block/dark_oak_agent_desk",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "modding_workspace:block/dark_oak_agent_desk",
+      "y": 270
+    }
+  }
+}

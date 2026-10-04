@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "modding_workspace:dark_oak_agent_desk"
+  ],
+  "result": {
+    "id": "modding_workspace:agent_desk"
+  }
+}

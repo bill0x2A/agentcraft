@@ -18,6 +18,7 @@ final class BrowserPreviewScreen extends Screen {
     private final BrowserDisplay display;
     private EditBox address;
     private boolean browserFocused;
+    private boolean groupBrowser;
     private String notice="";
     private int left,top,viewWidth,viewHeight;
     BrowserPreviewScreen(Screen previous){this(previous,null);}
@@ -29,11 +30,14 @@ final class BrowserPreviewScreen extends Screen {
         minecraft.textInputManager().startTextInput(this);
         String draft=address==null?surface.requestedUrl:address.getValue();
         address=new EditBox(font,90,10,Math.max(80,width-286),20,Component.literal("Web address"));
-        address.setMaxLength(8192);address.setValue(draft);addRenderableWidget(address);
+        address.setMaxLength(8192);address.setValue(draft);
+        groupBrowser=surface.requestedUrl.matches("http://127\\.0\\.0\\.1:[0-9]+/[a-f0-9]{64}/view/group_[a-f0-9]+$");
+        if(!groupBrowser){addRenderableWidget(address);
         addRenderableWidget(Button.builder(Component.literal("Back"),b->{if(surface.browser!=null)surface.browser.getCefBrowser().goBack();}).bounds(10,10,38,20).build());
         addRenderableWidget(Button.builder(Component.literal("Reload"),b->{if(surface.browser!=null)surface.browser.getCefBrowser().reload();}).bounds(50,10,38,20).build());
         addRenderableWidget(Button.builder(Component.literal("Go"),b->navigate()).bounds(width-192,10,32,20).build());
         addRenderableWidget(Button.builder(Component.literal("Home"),b->{address.setValue("office:home");navigate();}).bounds(width-156,10,40,20).build());
+        }
         if(display!=null)addRenderableWidget(Button.builder(Component.literal("Remove"),b->{BrowserEngine.remove(display);onClose();}).bounds(width-112,10,52,20).build());
         addRenderableWidget(Button.builder(Component.literal("Close"),b->onClose()).bounds(width-56,10,46,20).build());
         viewWidth=Math.min(width-24,(height-64)*16/9);viewHeight=viewWidth*9/16;
@@ -56,8 +60,12 @@ final class BrowserPreviewScreen extends Screen {
     @Override public void tick(){surface.tick();if(display!=null && display.isRemoved())onClose();}
     @Override public void extractRenderState(GuiGraphicsExtractor g,int mx,int my,float delta) {
         g.fill(0,0,width,height,0xff090e15);
+        if(groupBrowser)g.text(font,"Group browser · stays running outside Minecraft",12,16,0xff7cdbb6,false);
         if(surface.ready())g.blit(surface.browser.getTextureView(),RenderSystem.getSamplerCache().getSampler(AddressMode.CLAMP_TO_EDGE,AddressMode.CLAMP_TO_EDGE,FilterMode.LINEAR,FilterMode.LINEAR,false),left,top,left+viewWidth,top+viewHeight,0,1,0,1);
-        else g.text(font,surface.status(),12,50,0xffbdcce0,false);
+        else {
+            g.text(font,font.plainSubstrByWidth(surface.status(),width-24),12,50,0xffbdcce0,false);
+            if(surface.error==null)g.text(font,font.plainSubstrByWidth(BrowserEngine.loadingHint(),width-24),12,68,0xff8cbdba,false);
+        }
         super.extractRenderState(g,mx,my,delta);
         g.text(font,notice.isEmpty()?(display==null?"F9 / Escape closes this preview":"Escape returns to the world · this browser keeps running"):notice,12,height-16,0xff8cbdba,false);
     }

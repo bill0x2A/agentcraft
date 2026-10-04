@@ -1,0 +1,4 @@
+AgentCraft studio, block assets and supporting Java code
+https://github.com/blendi-remade/agentcraft
+Upstream revision: 0be815deb4833a9ce0f070c29737bba882e98759
+Adapted for Herdr-backed Agent Office. Original license: AgentCraft-MIT.txt

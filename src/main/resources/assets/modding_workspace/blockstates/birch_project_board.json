@@ -1,0 +1,20 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "modding_workspace:block/birch_project_board",
+      "y": 0
+    },
+    "facing=east": {
+      "model": "modding_workspace:block/birch_project_board",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "modding_workspace:block/birch_project_board",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "modding_workspace:block/birch_project_board",
+      "y": 270
+    }
+  }
+}

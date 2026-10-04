@@ -1,0 +1,73 @@
+#!/usr/bin/env python3
+"""Office groups from any terminal, including Herdr. Run --help for all operations."""
+import argparse
+import json
+import os
+from pathlib import Path
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'bridge'))
+import groups
+
+
+def main():
+    p = argparse.ArgumentParser(description=__doc__)
+    p.add_argument('--json', action='store_true', help='Machine-readable output for agents and scripts')
+    sub = p.add_subparsers(dest='op', required=True)
+    sub.add_parser('projects', help='Browse accessible Linear projects and their IDs').add_argument('--cursor', help='Continue from the cursor returned by the previous page')
+    sub.add_parser('list', help='Show groups, agents, tasks and issue sources')
+    attach = sub.add_parser('attach', help='Take control of this same terminal in the normal Herdr UI')
+    attach.add_argument('terminal')
+    create = sub.add_parser('create', help='Create a group; issue tracking is optional')
+    create.add_argument('name'); create.add_argument('--cwd', help='Defaults to the parent directory, or the current directory for a root group'); create.add_argument('--parent')
+    for name in ('configure', 'join', 'leave', 'leader', 'launch', 'send', 'task', 'update-task', 'source', 'disconnect', 'issues', 'import', 'context', 'browser'):
+        s = sub.add_parser(name); s.add_argument('group', nargs='?', default=os.environ.get('OFFICE_GROUP'), help='Group name or ID; defaults to OFFICE_GROUP')
+        if name == 'configure':
+            for field in ('name', 'cwd', 'parent', 'instructions'): s.add_argument('--'+field)
+            s.add_argument('--worktree', choices=['agent-choice', 'shared', 'isolated'])
+        if name in ('join', 'leave', 'leader', 'send'): s.add_argument('--terminal', required=name != 'leader', default='' if name == 'leader' else None)
+        if name in ('join', 'launch'): s.add_argument('--role', default='member')
+        if name == 'launch':
+            s.add_argument('--agent', choices=['shell', 'claude', 'codex'], default='shell'); s.add_argument('--name')
+        if name == 'send': s.add_argument('--message', required=True)
+        if name == 'task': s.add_argument('--title', required=True); s.add_argument('--description', default='')
+        if name == 'update-task':
+            s.add_argument('--task', required=True); s.add_argument('--status', choices=groups.STATES); s.add_argument('--assignee')
+        if name == 'source': s.add_argument('--provider', choices=['linear', 'github'], required=True); s.add_argument('--scope', required=True); s.add_argument('--name')
+        if name in ('disconnect', 'issues', 'import'): s.add_argument('--source', required=True)
+        if name == 'issues': s.add_argument('--cursor')
+        if name == 'import': s.add_argument('--issue', required=True)
+    args = vars(p.parse_args()); raw = args.pop('json'); op = args.pop('op')
+    args = {k:v for k,v in args.items() if v is not None}
+    if op == 'create' and not args.get('cwd') and not args.get('parent'):
+        args['cwd'] = os.getcwd()
+    if op == 'attach':
+        import runtime
+        groups.live_session(args['terminal'])
+        os.execvpe('herdr', ['herdr','terminal','attach',args['terminal'],'--takeover'],runtime.environment())
+    if op not in ('list', 'create', 'projects') and not args.get('group'): p.error('Specify a group or set OFFICE_GROUP')
+    if op == 'context':
+        data = groups.dispatch('snapshot', {}); g = groups.group(data, args['group'])
+        result = {'group': g, 'tasks': [t for t in data['tasks'] if t['group'] == g['id']],
+                  'instructions': 'Use workspace --help to form subgroups, add sessions, assign tasks and send messages. '
+                  'Worktrees are optional; respect the group preference and coordinate shared files. '
+                  'Issue sources are optional. Importing or completing a local task never changes the external issue.'}
+    else: result = groups.dispatch('snapshot' if op == 'list' else op, args)
+    if raw or op != 'list': print(json.dumps(result, indent=2))
+    else:
+        try:
+            from office import sessions
+            live = {s['terminal']: s for s in sessions()}
+        except (OSError, RuntimeError): live = {}
+        for g in result['groups']:
+            print(f"{g['name']}  [{g['id']}]\n  {g['cwd']}" + (f"  subgroup of {g['parent']}" if g['parent'] else ''))
+            for member in g['members']:
+                sid = member['terminal']; s = live.get(sid, {})
+                print(f"  {'*' if g['leader'] == sid else '-'} {s.get('label',sid)} | {member['role']} | {s.get('status','Unavailable')} | {sid}")
+            tasks = [t for t in result['tasks'] if t['group'] == g['id']]
+            print(f"  {len(tasks)} tasks · {len(g['sources'])} issue sources\n")
+        if not result['groups']: print('No groups yet. Try: workspace create "My team" --cwd /path/to/project')
+
+if __name__ == '__main__':
+    try: main()
+    except (ValueError, KeyError, OSError, RuntimeError) as e:
+        print(f'Office: {e}', file=sys.stderr); raise SystemExit(1)

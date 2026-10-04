@@ -9,7 +9,7 @@ The Unix socket on which the bridge accepts connections. The default path is `.r
 _Avoid_: port, endpoint
 
 **Office request**:
-The first JSON line of a connection. Its type is `sessions`, `create`, or `attach`.
+The first JSON line of a connection. Its type is `sessions`, `create`, `attach`, `workspace`, or `capabilities`.
 _Avoid_: command, handshake
 
 **Control operation**:
@@ -67,7 +67,7 @@ _Avoid_: unit test, verification
 - The label of a session is the label of its **Herdr workspace**, or its pane ID if there is no label.
 - An **Office request** starts either one **Control operation** or one **Attachment**.
 - An **Attachment** serves exactly one terminal ID. The bridge refuses a terminal ID that is not in the session list.
-- An **Attachment** never takes control from a different viewer and never closes a **Pane**.
+- An explicit focused **Attachment** may request takeover. A passive display never requests takeover. Neither closes a **Pane**.
 - A **Fixture** closes only if its pane ID still holds its recorded terminal ID.
 
 ## Example dialogue
@@ -83,3 +83,7 @@ _Avoid_: unit test, verification
 - "client" in `bridge/server.py` is a viewer connection. It is not the Minecraft client, and it is not `herdr-client.sock`.
 - "session" in **Herdr RPC** names (`session.snapshot`) is the full Herdr state. It is not a session of the office.
 - "verification" belongs to the mod. A bridge test is a **Live test**.
+
+Working groups are persisted in groups.json with a file lock and atomic replacement.
+The CLI and workspace office requests call the same group operations. Issue provider
+reads happen outside the lock; imports recheck the source before saving.

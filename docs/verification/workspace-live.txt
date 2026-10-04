@@ -1,0 +1,42 @@
+START workspace integration
+PASS AgentCraft studio generated in a separate dimension
+PASS Shared group and freeform task screens render
+PASS Group session opens its real Herdr terminal
+PASS Persistent Chromium page rendered through the Minecraft browser display
+PASS Original crab and robot retained in the studio
+PASS Table and connected task wall link to a shared group; ALL PASS
+
+2026-10-03 additional checks
+PASS 11 group regression tests (persistence, concurrent writes, subgroup cycles, optional sources, scoped imports, blocked-agent input)
+PASS Herdr two-session isolation, reconnect and ended-session regression
+PASS explicit terminal handoff preserves the process and contents; passive viewers never take over
+PASS persistent browser JPEG frames, real input, origin and capability checks
+PASS page JavaScript and input survive Minecraft exit
+PASS persistent browser host restart and shutdown
+PASS real public GitHub issue listing (AgentCraft repository returned zero issues)
+PASS final Gradle build and git diff whitespace check
+NOT RUN authenticated Linear project/issue access; requires LINEAR_API_KEY
+NOT RUN live Claude/Codex launches; all live fixtures were shells
+
+2026-10-03 completion audit follow-up
+PASS 15 group regression tests, including terminal CLI project pagination,
+     subgroup directory inheritance and rejection before launching invalid sessions
+PASS real Herdr group launch with correct cwd, workspace on PATH, OFFICE_GROUP,
+     OFFICE_COMMAND and shared context; disposable shell removed
+PASS real public GitHub issue #1066 from linear/linear imported into temporary
+     group data, preserving body/link and deduplicating a second import
+PASS Linear project catalog, scoped issue list and selected issue import through
+     the HTTP serialization boundary with fixture responses (no account access)
+PASS all three Linear queries validated with graphql-core against the official
+     linear/linear packages/sdk/src/schema.graphql fetched on 2026-10-03
+PENDING authenticated Linear account verification; LINEAR_API_KEY is not present
+        in the current environment. User asked to configure the bridge locally.
+
+2026-10-04 authenticated Linear verification (resolves the pending check above)
+PASS project catalog with real .env credential (50 projects on the first page)
+PASS project-scoped issue browsing and selected issue import into temporary state
+PASS reloaded Minecraft bridge reads .env and returns a distinct second project page
+PASS description/link preservation, repeat-import deduplication and local status preservation
+PASS 17 regression tests including literal .env parsing, environment precedence,
+     no secret export and redacted configuration errors
+No external tracker mutations or new AI agents; temporary import state removed.

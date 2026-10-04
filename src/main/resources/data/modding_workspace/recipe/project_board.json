@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "group": "agent_office",
+  "pattern": [
+    "CCC",
+    "PPP",
+    " S "
+  ],
+  "key": {
+    "C": "minecraft:copper_ingot",
+    "P": "minecraft:paper",
+    "S": "minecraft:stick"
+  },
+  "result": {
+    "id": "modding_workspace:project_board"
+  }
+}
